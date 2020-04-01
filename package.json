@@ -1,0 +1,22 @@
+{
+  "name": "redditimposter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReimarPB/RedditImposter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ReimarPB/RedditImposter/issues"
+  },
+  "homepage": "https://github.com/ReimarPB/RedditImposter#readme",
+  "dependencies": {
+    "jsdom": "^16.2.2"
+  }
+}
