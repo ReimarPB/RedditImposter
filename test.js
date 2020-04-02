@@ -16,9 +16,11 @@ const credentials = {
 	const client = new RedditImposter.Client;
 
 	await client.login(credentials);
-	
+
 	let status = await client.getStatus();
 
 	console.log(status);
+
+	await client.setAnswer("The atoms that make up my body.");
 
 })();

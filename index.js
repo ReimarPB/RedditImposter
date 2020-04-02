@@ -68,7 +68,7 @@ module.exports = {
 
 		getStatus() {
 
-			return new Promise(resolve => {
+			return new Promise((resolve, reject) => {
 
 				// Get the results page
 				const options = {
@@ -120,10 +120,65 @@ module.exports = {
 				});
 
 				req.on("error", err => {
-					console.error(err);
 					reject(err);
 				});
 
+				req.end();
+
+			});
+
+		}
+
+		setAnswer(answer) {
+
+			return new Promise((resolve, reject) => {
+
+				if (!this.csrf) {
+					console.error("[RedditImposter] ERROR: A CSRF token must be set before you can update your answer. Try calling setStatus() first.");
+					return "No CSRF token set";
+				}
+
+				// POST the new answer
+				const data = `note=${encodeURIComponent(answer)}&csrf_token=${this.csrf}`;
+
+				const options = {
+					hostname: "gremlins-api.reddit.com",
+					path: "/create_note",
+					method: "POST",
+					headers: {
+						Cookie: toCookieString(this.cookies),
+						"Content-Length": data.length
+					}
+				};
+
+				const req = https.request(options, res => {
+
+					let data = "";
+					res.on("data", chunk => data += chunk);
+
+					res.on("end", () => {
+
+						console.log(data);
+
+						if (res.statusCode !== 200) reject(data);
+
+						try {
+
+							data = JSON.parse(data);
+
+							if (!data.success) reject(JSON.stringify(data));
+
+							resolve(data.note_id);
+
+						} catch(e) {
+							reject(data);
+						}
+
+					});
+
+				});
+				
+				req.write(data);
 				req.end();
 
 			});
