@@ -32,6 +32,12 @@ I don't mind pull requests, as long as you have nothing against dealing with my 
 
 `setAnswer(answer: String) -> Promise<String>` - Sets your own answer to the question and returns the ID upon success and error data upon failure. A CSRF token is required for this to work so you must call any method first.
 
+`setFlair(flair: String) -> Promise<undefined | String>` - Sets the user flair to one of the four possible flairs and returns error data upon failure. These are the possible flair types:
+* `RedditImposter.flairs.IMPOSTER` - Track how often your answer is identified by other players.
+* `RedditImposter.flairs.HUMAN` - Track how often your answer is not identified by other players.
+* `RedditImposter.flairs.IMPOSTER_IDENTIFIER` - Track how often you identify the imposter's answer.
+* `RedditImposter.flairs.HUMAN_IDENTIFIER` - Track how often you identify a human's answer.
+
 ## Footnotes
 * Reddit seems to (as of Apr 2, 13:00 GMT) no longer tell how many total answers have been made so `totalAnswers` in `getStatus()` will be NaN for now. I don't know if this change is permanent.
 * You can login directly with your CSRF token (which is always visible in the source of the page) by using `client.csrf = "YOUR_TOKEN"`

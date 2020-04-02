@@ -4,6 +4,14 @@ const { JSDOM } = jsdom;
 
 module.exports = {
 
+	// Flairs constants for setFlair()
+	flairs: {
+		IMPOSTER: "imposter",
+		HUMAN: "human",
+		IMPOSTER_IDENTIFIER: "robot-detective",
+		HUMAN_IDENTIFIER: "human-detective"
+	},
+
 	Client: class {
 
 		constructor() {
@@ -135,7 +143,7 @@ module.exports = {
 
 				if (!this.csrf) {
 					console.error("[RedditImposter] ERROR: A CSRF token must be set before you can update your answer. Try calling setStatus() first.");
-					return "No CSRF token set";
+					return reject("No CSRF token set");
 				}
 
 				// POST the new answer
@@ -158,8 +166,6 @@ module.exports = {
 
 					res.on("end", () => {
 
-						console.log(data);
-
 						if (res.statusCode !== 200) reject(data);
 
 						try {
@@ -169,6 +175,66 @@ module.exports = {
 							if (!data.success) reject(JSON.stringify(data));
 
 							resolve(data.note_id);
+
+						} catch(e) {
+							reject(data);
+						}
+
+					});
+
+				});
+				
+				req.write(data);
+				req.end();
+
+			});
+
+		}
+
+		setFlair(flair) {
+
+			return new Promise((resolve, reject) => {
+
+				// Validate flair
+				if (!Object.values(module.exports.flairs).includes(flair)) {                    // Unnecessary fancy code to list all flairs 
+					console.error("[RedditImposter] ERROR: Invalid flair. Valid flairs are: " + Object.keys(module.exports.flairs).map(val => "RedditImposter.flairs." + val).join(", "));
+					return reject("Invalid flair");
+				}
+
+				if (!this.csrf) {
+					console.error("[RedditImposter] ERROR: A CSRF token must be set before you can update your flair. Try calling setStatus() first.");
+					return reject("No CSRF token set");
+				}
+
+				// POST the new answer
+				const data = `flair_type=${flair}&csrf_token=${this.csrf}`;
+
+				const options = {
+					hostname: "gremlins-api.reddit.com",
+					path: "/flair_type",
+					method: "POST",
+					headers: {
+						Cookie: toCookieString(this.cookies),
+						"Content-Length": data.length
+					}
+				};
+
+				const req = https.request(options, res => {
+
+					let data = "";
+					res.on("data", chunk => data += chunk);
+
+					res.on("end", () => {
+
+						if (res.statusCode !== 200) reject(data);
+
+						try {
+
+							data = JSON.parse(data);
+
+							if (!data.success) reject(JSON.stringify(data));
+
+							resolve();
 
 						} catch(e) {
 							reject(data);
