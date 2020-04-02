@@ -38,9 +38,11 @@ I don't mind pull requests, as long as you have nothing against dealing with my 
 * `RedditImposter.flairs.IMPOSTER_IDENTIFIER` - Track how often you identify the imposter's answer.
 * `RedditImposter.flairs.HUMAN_IDENTIFIER` - Track how often you identify a human's answer.
 
-`getAnswers() -> Promise<undefined | Array<Object>>` - Starts a new round and returns the 5 answers where you have to guess one of them. Each answer object has the following properties:
+`getAnswers() -> Promise<Array<Object> | String>` - Starts a new round and returns the 5 answers where you have to guess one of them. Returns error string upon failure. Each answer object has the following properties:
 * `text: String` - The answer itself.
 * `id: String` - The ID of the answer, used to submit a guess.
+
+`submitGuess(answer: Object | String) -> Promise<Boolean | String>` - Submits one of the answers returned by getAnswers() and returns true if you won and false if you lost. You can pass either the answer ID or the answer object.
 
 ## Footnotes
 * Reddit seems to (as of Apr 2, 13:00 GMT) no longer tell how many total answers have been made so `totalAnswers` in `getStatus()` will be NaN for now. I don't know if this change is permanent.

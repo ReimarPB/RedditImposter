@@ -4,7 +4,7 @@ const { JSDOM } = jsdom;
 
 module.exports = {
 
-	// Flairs constants for setFlair()
+	// Flair constants for setFlair()
 	flairs: {
 		IMPOSTER: "imposter",
 		HUMAN: "human",
@@ -63,7 +63,6 @@ module.exports = {
 
 				// Reject on error
 				req.on("error", err => {
-					console.error(err)
 					reject(err);
 				});
 
@@ -288,6 +287,59 @@ module.exports = {
 
 				});
 				
+				req.end();
+
+			});
+
+		}
+
+		submitGuess(answer) {
+
+			return new Promise((resolve, reject) => {
+
+				// This way both the answer object and just the ID can be passed
+				answer = answer.id || answer;
+
+				const data = `note_id=${answer}&csrf_token=${this.csrf}`;
+
+				const options = {
+					hostname: "gremlins-api.reddit.com",
+					path: "/submit_guess",
+					method: "POST",
+					headers: {
+						Cookie: toCookieString(this.cookies),
+						"Content-Length": data.length
+					}
+				};
+
+				const req = https.request(options, res => {
+
+					let data = "";
+					res.on("data", chunk => data += chunk);
+
+					res.on("end", () => {
+
+						if (res.statusCode !== 200) reject(data);
+
+						try {
+
+						data = JSON.parse(data);
+
+						if (!data.success) reject(JSON.stringify(data));
+
+						this.previousResult = data.result;
+
+						resolve(data.result == "WIN");
+
+						} catch(e) {
+							reject(data);
+						}
+
+					});
+
+				});
+				
+				req.write(data);
 				req.end();
 
 			});
