@@ -15,14 +15,23 @@ const credentials = {
 
 	const client = new RedditImposter.Client;
 
+	// Login
 	await client.login(credentials);
 
-	let status = await client.getStatus().catch(console.error);
+	// Get current stats
+	const status = await client.getStatus().catch(console.error);
 
 	console.log(status);
 
+	// Set own answer
 	await client.setAnswer("The atoms that make up my body.").catch(console.error);
 
+	// Set flair to imposter identifier
 	await client.setFlair(RedditImposter.flairs.IMPOSTER_IDENTIFIER).catch(console.error);
+
+	// Get 5 random answers
+	const answers = await client.getAnswers().catch(console.error);
+
+	console.log(answers);
 
 })();

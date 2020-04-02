@@ -142,8 +142,7 @@ module.exports = {
 			return new Promise((resolve, reject) => {
 
 				if (!this.csrf) {
-					console.error("[RedditImposter] ERROR: A CSRF token must be set before you can update your answer. Try calling setStatus() first.");
-					return reject("No CSRF token set");
+					return reject("A CSRF token must be set before you can update your answer. Try calling setStatus() first.");
 				}
 
 				// POST the new answer
@@ -196,14 +195,12 @@ module.exports = {
 			return new Promise((resolve, reject) => {
 
 				// Validate flair
-				if (!Object.values(module.exports.flairs).includes(flair)) {                    // Unnecessary fancy code to list all flairs 
-					console.error("[RedditImposter] ERROR: Invalid flair. Valid flairs are: " + Object.keys(module.exports.flairs).map(val => "RedditImposter.flairs." + val).join(", "));
-					return reject("Invalid flair");
+				if (!Object.values(module.exports.flairs).includes(flair)) {       // Unnecessary fancy code to list all flairs \/
+					return reject("Invalid flair. Valid flairs are: " + Object.keys(module.exports.flairs).map(val => "RedditImposter.flairs." + val).join(", "));
 				}
 
 				if (!this.csrf) {
-					console.error("[RedditImposter] ERROR: A CSRF token must be set before you can update your flair. Try calling setStatus() first.");
-					return reject("No CSRF token set");
+					return reject("A CSRF token must be set before you can update your flair. Try calling setStatus() first.");
 				}
 
 				// POST the new answer
@@ -245,6 +242,52 @@ module.exports = {
 				});
 				
 				req.write(data);
+				req.end();
+
+			});
+
+		}
+
+		getAnswers() {
+
+			return new Promise((resolve, reject) => {
+
+				const options = {
+					hostname: "gremlins-api.reddit.com",
+					path: "/room",
+					method: "GET",
+					headers: {
+						Cookie: toCookieString(this.cookies)
+					}
+				};
+
+				const req = https.request(options, res => {
+
+					let data = "";
+					res.on("data", chunk => data += chunk);
+
+					res.on("end", () => {
+
+						if (res.statusCode !== 200) reject(data);
+
+						// Parse the DOM to get the answers
+						const dom = JSDOM.fragment(data);
+						const answers = dom.querySelectorAll("gremlin-note");
+						const result = [];
+
+						answers.forEach(answer => {
+							result.push({
+								text: answer.textContent.trim(),
+								id: answer.getAttribute("id")
+							});
+						});
+
+						resolve(result);
+
+					});
+
+				});
+				
 				req.end();
 
 			});

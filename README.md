@@ -38,7 +38,11 @@ I don't mind pull requests, as long as you have nothing against dealing with my 
 * `RedditImposter.flairs.IMPOSTER_IDENTIFIER` - Track how often you identify the imposter's answer.
 * `RedditImposter.flairs.HUMAN_IDENTIFIER` - Track how often you identify a human's answer.
 
+`getAnswers() -> Promise<undefined | Array<Object>>` - Starts a new round and returns the 5 answers where you have to guess one of them. Each answer object has the following properties:
+* `text: String` - The answer itself.
+* `id: String` - The ID of the answer, used to submit a guess.
+
 ## Footnotes
 * Reddit seems to (as of Apr 2, 13:00 GMT) no longer tell how many total answers have been made so `totalAnswers` in `getStatus()` will be NaN for now. I don't know if this change is permanent.
 * You can login directly with your CSRF token (which is always visible in the source of the page) by using `client.csrf = "YOUR_TOKEN"`
-* getStatus() automatically sets your CSRF token. There are more methods to come that do this.
+* getStatus() and getAnswers() automatically sets your CSRF token.
